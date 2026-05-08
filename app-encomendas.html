@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Aviso de Encomendas</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      background: #25D366;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .cliente {
+      background: #fafafa;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .acoes {
+      display: flex;
+      gap: 8px;
+    }
+
+    .acoes button {
+      width: auto;
+      padding: 8px 12px;
+      margin: 0;
+    }
+
+    .delete {
+      background: #d9534f;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>App Aviso de Encomendas</h2>
+
+  <input type="text" id="nome" placeholder="Nome do cliente">
+  <input type="text" id="telefone" placeholder="Telefone com DDD. Ex: 63999999999">
+
+  <textarea id="mensagem" rows="3">sua encomenda da Shopee chegou e está disponível para retirada no guichê da Real Expresso.</textarea>
+
+  <button onclick="salvarCliente()">Cadastrar Cliente</button>
+
+  <h3>Clientes cadastrados</h3>
+  <div id="listaClientes"></div>
+</div>
+
+<script>
+let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+
+function salvarStorage() {
+  localStorage.setItem('clientes', JSON.stringify(clientes));
+}
+
+function salvarCliente() {
+  let nome = document.getElementById('nome').value.trim();
+  let telefone = document.getElementById('telefone').value.trim();
+
+  if (!nome || !telefone) {
+    alert('Preencha nome e telefone');
+    return;
+  }
+
+  clientes.push({ nome, telefone });
+  salvarStorage();
+  renderizar();
+
+  document.getElementById('nome').value = '';
+  document.getElementById('telefone').value = '';
+}
+
+function enviar(cliente) {
+  let mensagemBase = document.getElementById('mensagem').value;
+  let mensagem = `Olá ${cliente.nome}, ${mensagemBase}`;
+  let url = `https://wa.me/55${cliente.telefone}?text=${encodeURIComponent(mensagem)}`;
+  window.location.href = url;
+}
+
+function excluir(index) {
+  clientes.splice(index, 1);
+  salvarStorage();
+  renderizar();
+}
+
+function renderizar() {
+  let lista = document.getElementById('listaClientes');
+  lista.innerHTML = '';
+
+  clientes.forEach((cliente, index) => {
+    lista.innerHTML += `
+      <div class="cliente">
+        <div>
+          <strong>${cliente.nome}</strong><br>
+          ${cliente.telefone}
+        </div>
+
+        <div class="acoes">
+          <button onclick='enviar(${JSON.stringify(cliente)})'>Enviar</button>
+          <button class="delete" onclick='excluir(${index})'>Excluir</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+renderizar();
+</script>
+
+</body>
+</html>
