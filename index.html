@@ -26,6 +26,8 @@
 
     <input type="file" id="importarCSV" accept=".csv" onchange="importarCSV(event)" />
 
+    <input type="text" id="buscar" placeholder="Buscar cliente" oninput="filtrarClientes()" />
+
     <h3>Clientes cadastrados</h3>
     <div id="listaClientes"></div>
   </div>
@@ -67,11 +69,11 @@ function excluirCliente(index){
   renderizarClientes();
 }
 
-function renderizarClientes(){
+function renderizarClientes(listaFiltrada = clientes){
   const lista = document.getElementById('listaClientes');
   lista.innerHTML='';
 
-  clientes.forEach((cliente,index)=>{
+  listaFiltrada.forEach((cliente,index)=>{
     lista.innerHTML += `
       <div class="cliente">
         <div>
@@ -85,6 +87,15 @@ function renderizarClientes(){
       </div>
     `;
   });
+}
+
+function filtrarClientes(){
+  const termo = document.getElementById('buscar').value.toLowerCase();
+  const filtrados = clientes.filter(cliente =>
+    cliente.nome.toLowerCase().includes(termo) ||
+    cliente.telefone.includes(termo)
+  );
+  renderizarClientes(filtrados);
 }
 
 function importarCSV(event){
