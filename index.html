@@ -29,6 +29,7 @@
     <input type="text" id="buscar" placeholder="Buscar cliente" oninput="filtrarClientes()" />
 
     <h3>Clientes cadastrados</h3>
+    <button onclick="enviarSelecionados()">Enviar selecionados</button>
     <div id="listaClientes"></div>
   </div>
 
@@ -77,6 +78,7 @@ function renderizarClientes(listaFiltrada = clientes){
     lista.innerHTML += `
       <div class="cliente">
         <div>
+          <input type="checkbox" onchange="toggleSelecionado(${index})">
           <strong>${cliente.nome}</strong><br>
           ${cliente.telefone}
         </div>
@@ -87,6 +89,31 @@ function renderizarClientes(listaFiltrada = clientes){
       </div>
     `;
   });
+}
+
+function toggleSelecionado(index){
+  clientes[index].selecionado = !clientes[index].selecionado;
+  salvarNoStorage();
+}
+
+function enviarSelecionados(){
+  const selecionados = clientes.filter(cliente => cliente.selecionado);
+
+  if(selecionados.length === 0){
+    alert('Selecione ao menos um cliente');
+    return;
+  }
+
+  let i = 0;
+
+  function proximo(){
+    if(i >= selecionados.length) return;
+    enviarMensagem(selecionados[i]);
+    i++;
+    setTimeout(proximo, 3000);
+  }
+
+  proximo();
 }
 
 function filtrarClientes(){
